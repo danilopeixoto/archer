@@ -37,7 +37,7 @@ int main(int argc, char ** argv) {
     machine.load("res/main.arc");
     machine.run();
 
-    std::cout << "Output: " << machine[1024] << std::endl;
+    std::cout << "Output: " << machine[128] << std::endl;
 
     return 0;
 }

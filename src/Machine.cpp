@@ -122,6 +122,8 @@ Boolean Machine::load(const String & filename) {
             default:
                 return false;
             }
+
+            memory[index++] = word;
         }
         else if (size == 4) {
             switch (commandData[0]) {
@@ -139,11 +141,9 @@ Boolean Machine::load(const String & filename) {
             default:
                 return false;
             }
-        }
-        else
-            return false;
 
-        memory[index++] = word;
+            memory[index++] = word;
+        }
     }
 
     return true;
