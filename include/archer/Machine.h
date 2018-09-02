@@ -30,16 +30,41 @@
 
 #include <archer/Global.h>
 
+#include <unordered_map>
+
+#define ARCHER_STACK_SIZE 128
+#define ARCHER_DATA_SIZE 256
+#define ARCHER_MEMORY_SIZE (ARCHER_STACK_SIZE + ARCHER_DATA_SIZE)
+#define ARCHER_REGISTER_SIZE 16
+#define ARCGER_STACK_BEGIN 0
+#define ARCHER_DATA_BEGIN ARCHER_STACK_SIZE
+
 ARCHER_NAMESPACE_BEGIN
 
-typedef UInteger16 Word;
+typedef UInteger64 Word;
+
+typedef Word StackSegment[ARCHER_STACK_SIZE];
+typedef Word DataSegment[ARCHER_DATA_SIZE];
+typedef Word ProcessorRegister[ARCHER_REGISTER_SIZE];
+
+typedef std::unordered_map<String, UInteger> SymbolTable;
+
+struct Memory {
+    StackSegment stack;
+    DataSegment data;
+
+    Memory();
+    ~Memory();
+
+    Word & operator [](UInteger);
+    const Word & operator [](UInteger) const;
+};
 
 enum InstructionType {
     Load = 0,
     Store,
     Move,
     Set,
-    Clear,
     Add,
     Subtract,
     Multiply,
@@ -54,9 +79,9 @@ enum InstructionType {
 enum RegisterType {
     ProgramCounter = 0,
     Instruction,
-    Source0,
-    Source1,
-    Destination,
+    Operand0,
+    Operand1,
+    Operand2,
     AbortFlag,
     Register0,
     Register1,
@@ -70,10 +95,6 @@ enum RegisterType {
     Register9
 };
 
-Word assembly(InstructionType, Word);
-Word assembly(InstructionType, Word, Word);
-Word assembly(InstructionType, Word, Word, Word);
-
 class Machine {
 public:
     Machine();
@@ -81,19 +102,26 @@ public:
 
     Word & operator [](UInteger);
     const Word & operator [](UInteger) const;
-    Machine & operator <<(Word);
 
+    Boolean load(const String &);
     Machine & run();
     Machine & reset();
 
 private:
-    typedef Array<Word, 16> Register;
-    typedef Array<Word, 256> Memory;
+    static const SymbolTable symbols;
 
-    UInteger heapSize, stackIndex;
-
-    Register processorRegister;
+    ProcessorRegister processorRegister;
     Memory memory;
+
+    Word assemblyA(Word, Word, Word) const;
+    Word assemblyB(Word, Word, Word) const;
+    Word assemblyC(Word, Word, Word, Word) const;
+
+    void disassemblyA(Word, Word &, Word &, Word &) const;
+    void disassemblyB(Word, Word &, Word &, Word &) const;
+    void disassemblyC(Word, Word &, Word &, Word &, Word &) const;
+
+    InstructionType disassemblyInstruction(Word) const;
 
     Machine & decode();
     Machine & execute();

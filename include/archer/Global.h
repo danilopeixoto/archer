@@ -34,14 +34,20 @@
 #define ARCHER_COPYRIGHT "Copyright (c) 2018, Danilo Peixoto. All rights reserved."
 #define ARCHER_LICENSE "BSD-3-Clause License"
 
+#define ARCHER_VERSION_MAJOR 1
+#define ARCHER_VERSION_MINOR 0
+#define ARCHER_VERSION_PATCH 0
+
 #define ARCHER_NAMESPACE_BEGIN namespace archer {
 #define ARCHER_NAMESPACE_END };
 #define ARCHER_NAMESPACE_USING using namespace archer;
 
+#define ARCHER_FALSE 0
+#define ARCHER_TRUE 1
+
 #define ARCHER_NULL nullptr
 
 #include <string>
-#include <array>
 
 ARCHER_NAMESPACE_BEGIN
 
@@ -64,8 +70,6 @@ typedef float Float32;
 typedef double Float64;
 typedef Float64 Float;
 typedef std::string String;
-template<typename T, UInteger S>
-using Array = std::array<T, S>;
 
 ARCHER_NAMESPACE_END
 
