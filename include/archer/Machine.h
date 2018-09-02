@@ -72,7 +72,9 @@ enum InstructionType {
     And,
     Or,
     Xor,
-    Compare,
+    Less,
+    Greater,
+    Equal,
     Branch
 };
 

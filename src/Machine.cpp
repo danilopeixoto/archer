@@ -55,7 +55,9 @@ const SymbolTable Machine::symbols = {
     { "and", And },
     { "or", Or },
     { "xor", Xor },
-    { "cmp", Compare },
+    { "lt", Less },
+    { "gt", Greater },
+    { "eq", Equal },
     { "bch", Branch },
     { "pc", ProgramCounter },
     { "af", AbortFlag },
@@ -134,7 +136,9 @@ Boolean Machine::load(const String & filename) {
             case And:
             case Or:
             case Xor:
-            case Compare:
+            case Less:
+            case Greater:
+            case Equal:
             case Branch:
                 word = assemblyC(commandData[0], commandData[1], commandData[2], commandData[3]);
                 break;
@@ -234,7 +238,9 @@ Machine & Machine::decode() {
     case And:
     case Or:
     case Xor:
-    case Compare:
+    case Less:
+    case Greater:
+    case Equal:
     case Branch:
         disassemblyC(word, mnemonic, operand0, operand1, operand2);
 
@@ -291,7 +297,13 @@ Machine & Machine::execute() {
     case Xor:
         processorRegister[operand0] = processorRegister[operand1] ^ processorRegister[operand2];
         break;
-    case Compare:
+    case Less:
+        processorRegister[operand0] = processorRegister[operand1] < processorRegister[operand2];
+        break;
+    case Greater:
+        processorRegister[operand0] = processorRegister[operand1] > processorRegister[operand2];
+        break;
+    case Equal:
         processorRegister[operand0] = processorRegister[operand1] == processorRegister[operand2];
         break;
     case Branch:
