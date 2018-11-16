@@ -92,7 +92,7 @@ Boolean Machine::load(const String & filename) {
         return false;
 
     String line;
-    UInteger index = ARCGER_STACK_BEGIN;
+    UInteger index = ARCHER_STACK_BEGIN;
 
     while (std::getline(file, line) && index != ARCHER_STACK_SIZE) {
         std::vector<UInteger> commandData;
@@ -169,7 +169,9 @@ Machine & Machine::reset() {
     for (UInteger i = 0; i < ARCHER_MEMORY_SIZE; i++)
         memory[i] = 0;
 
-    processorRegister[ProgramCounter] = ARCGER_STACK_BEGIN;
+    initializeCache();
+
+    processorRegister[ProgramCounter] = ARCHER_STACK_BEGIN;
 
     return *this;
 }
@@ -208,10 +210,39 @@ InstructionType Machine::disassemblyInstruction(Word word) const {
     return (InstructionType)(word >> 48);
 }
 
+void Machine::initializeCache() {
+    for (UInteger i = 0; i < ARCHER_CACHE_SIZE; i++) {
+        CacheBlock & block = cache[i];
+
+        block.valid = false;
+    }
+}
+void Machine::loadCache(Word blockID, Word tag) {
+    CacheBlock & block = cache[blockID];
+
+    block.valid = true;
+    block.tag = tag;
+
+    for (UInteger i = 0; i < ARCHER_CACHE_BLOCK_SIZE; i++)
+        block.data[i] = memory[blockID * ARCHER_CACHE_BLOCK_SIZE + i];
+}
+Word Machine::cacheData(Word address) {
+    Word wordID = address & 0x0000000000000007;
+    Word blockID = (address >> 3) & 0x000000000000001F;
+    Word tag = address >> 8;
+
+    CacheBlock & block = cache[blockID];
+
+    if (!block.valid || block.tag != tag)
+        loadCache(blockID, tag);
+
+    return block.data[wordID];
+}
+
 Machine & Machine::decode() {
     Word mnemonic, operand0, operand1, operand2;
 
-    Word word = memory[processorRegister[ProgramCounter]];
+    Word word = cacheData(processorRegister[ProgramCounter]);
     processorRegister[Instruction] = disassemblyInstruction(word);
 
     switch (processorRegister[Instruction]) {

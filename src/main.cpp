@@ -34,10 +34,11 @@ ARCHER_NAMESPACE_USING
 int main(int argc, char ** argv) {
     Machine machine;
 
+    machine.reset();
     machine.load("res/main.arc");
     machine.run();
 
-    std::cout << "Output: " << machine[128] << std::endl;
+    std::cout << "Output: " << machine[ARCHER_STACK_SIZE] << std::endl;
 
     return 0;
 }

@@ -34,18 +34,27 @@
 
 #define ARCHER_STACK_SIZE 128
 #define ARCHER_DATA_SIZE 256
+#define ARCHER_CACHE_BLOCK_SIZE 8
+#define ARCHER_CACHE_SIZE 32
 #define ARCHER_MEMORY_SIZE (ARCHER_STACK_SIZE + ARCHER_DATA_SIZE)
 #define ARCHER_REGISTER_SIZE 16
-#define ARCGER_STACK_BEGIN 0
+#define ARCHER_STACK_BEGIN 0
 #define ARCHER_DATA_BEGIN ARCHER_STACK_SIZE
 
 ARCHER_NAMESPACE_BEGIN
 
 typedef UInteger64 Word;
 
+struct CacheBlock {
+    Boolean valid;
+    Word tag;
+    Word data[ARCHER_CACHE_BLOCK_SIZE];
+};
+
 typedef Word StackSegment[ARCHER_STACK_SIZE];
 typedef Word DataSegment[ARCHER_DATA_SIZE];
 typedef Word ProcessorRegister[ARCHER_REGISTER_SIZE];
+typedef CacheBlock Cache[ARCHER_CACHE_SIZE];
 
 typedef std::unordered_map<String, UInteger> SymbolTable;
 
@@ -114,6 +123,7 @@ private:
 
     ProcessorRegister processorRegister;
     Memory memory;
+    Cache cache;
 
     Word assemblyA(Word, Word, Word) const;
     Word assemblyB(Word, Word, Word) const;
@@ -124,6 +134,10 @@ private:
     void disassemblyC(Word, Word &, Word &, Word &, Word &) const;
 
     InstructionType disassemblyInstruction(Word) const;
+
+    void initializeCache();
+    void loadCache(Word, Word);
+    Word cacheData(Word);
 
     Machine & decode();
     Machine & execute();
