@@ -215,6 +215,7 @@ void Machine::initializeCache() {
         CacheBlock & block = cache[i];
 
         block.valid = false;
+        block.tag = 0;
     }
 }
 void Machine::loadCache(Word blockID, Word tag) {
